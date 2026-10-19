@@ -1,28 +1,35 @@
 # Where in the World is Carmen Sandiego?
 
-## At a glance
-
+## Summary
 | | |
 |---|---|
 | **Database** | **Snowflake** (database `CARMEN_ASSIGNMENT`), run through dbt Cloud |
 | **dbt packages** | `dbt-labs/dbt_utils` (surrogate keys, date spine, composite-key tests) |
-| **Input** | 13,582 field reports across 8 regional sheets, 1985 – 2022 |
+| **Input** | field reports across 8 regional sheets, 1985 – 2022 |
 | **Layers** | raw seeds → 8 staging views → 1 union view → 7 normalised core tables → 4 analytics views |
 | **Normal form** | Core schema is in **BCNF** (and therefore 3NF); every candidate key and foreign key is enforced by a dbt test |
 | **Tests** | 172 data tests, all passing |
 
 **Answers in one line each**
 
-- **(a)** Carmen is most likely to be found in **EUROPE** (6 of 12 months), **AMERICA** (4 months) or **ASIA** (2 months), but the three regions are within one or two percentage points of each other most months. **EUROPE** has its highest share of sightings from Aug until Nov. **AMERICA** leads mostly early in the year - Jan, Mar and Apr and then again in Jul. 
-**ATLANTIC** has not sightings reported in Feb and Jul. This could be a potential data entry error
+- **(a)** Carmen is most likely to be found in **EUROPE** (6 of 12 months), **AMERICA** (4 months) or **ASIA** (2 months), but the three regions are within one or two percentage points of each other most months. **EUROPE** has its highest share of sightings from Aug until Nov. **AMERICA** leads mostly early in the year - Jan, Mar and Apr and then again in Jul.
+
 ![alt text](image.png)
+
+**ATLANTIC** has not sightings reported in Feb and Jul. This could be a potential data entry error
+
 ![alt text](image-1.png)
+
 - **(b)** She is armed, wearing a jacket and *not* a hat in only **~4%** of sightings (2.4% – 4.7% by month). She almost always wears a jacket (91-94%), usually a hat (60-65%) and is rarely armed (11%), and these traits are independent of each other.
+
 ![alt text](image-2.png)
+
 - **(c)** Her three most occurring behaviours are **out-of-control (637)**, **complaining (636)** and **happy (635)**, which are separated by one sighting each.
+
 ![alt text](image-3.png)
 - **(d)** In any month, there is a **~14%** chance (12.1% – 15.3%) she shows one of those three behaviours, so she has no signature behaviour.
-![alt text](image-4.png)
+
+![alt text](image-5.png)
 
 ---
 

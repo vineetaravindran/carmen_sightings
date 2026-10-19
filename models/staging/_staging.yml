@@ -1,0 +1,140 @@
+version: 2
+
+# The common data dictionary, defined once and shared by all eight staging views.
+# For each column it declares:
+#   - name, data_type, description  → enforced on every view by the model contract
+#   - meta.synonyms                 → the names regional HQs use for it; the stg_carmen
+#                                     macro maps whichever one the seed contains
+#   - data_tests                    → run against every view
+# `region` has no synonyms: no source holds it, so the macro derives it from the sheet.
+
+anchors:
+  - &data_dictionary
+    - name: date_witness
+      data_type: date
+      description: Date of witness sighting
+      config:
+        meta:
+          synonyms: [date_witness, sighting, witnessed, sight_on]
+      data_tests: [not_null]
+    - name: witness
+      data_type: varchar
+      description: Name of witness sighting the perpetrator
+      config:
+        meta:
+          synonyms: [witness, citizen, observer, sighter]
+      data_tests: [not_null]
+    - name: agent
+      data_type: varchar
+      description: Name of field agent filing the report
+      config:
+        meta:
+          synonyms: [agent, officer, field_chap, filer]
+      data_tests: [not_null]
+    - name: date_agent
+      data_type: date
+      description: Date of field agent filing the report
+      config:
+        meta:
+          synonyms: [date_agent, date_filed, 报道, reported, file_on]
+      data_tests: [not_null]
+    - name: city_agent
+      data_type: varchar
+      description: HQ city where field agent files the report
+      config:
+        meta:
+          synonyms: [region_hq, city_interpol, interpol_spot, report_office]
+      data_tests: [not_null]
+    - name: country
+      data_type: varchar
+      description: Country of sighting (ISO 3166 alpha-2)
+      config:
+        meta:
+          synonyms: [country, nation]
+      data_tests: [not_null]
+    - name: city
+      data_type: varchar
+      description: City of sighting
+      config:
+        meta:
+          synonyms: [city, place, town]
+      data_tests: [not_null]
+    - name: latitude
+      data_type: float
+      description: Latitude of sighting
+      config:
+        meta:
+          synonyms: [latitude, lat_, lat, 纬度]
+      data_tests: [not_null]
+    - name: longitude
+      data_type: float
+      description: Longitude of sighting
+      config:
+        meta:
+          synonyms: [longitude, long_, long, 经度]
+      data_tests: [not_null]
+    - name: has_weapon
+      data_type: boolean
+      description: Was the perpetrator observed to be armed?
+      config:
+        meta:
+          synonyms: [has_weapon, armed?]
+      data_tests: [not_null]
+    - name: has_hat
+      data_type: boolean
+      description: Was the perpetrator wearing a hat?
+      config:
+        meta:
+          synonyms: [has_hat, chapeau?]
+      data_tests: [not_null]
+    - name: has_jacket
+      data_type: boolean
+      description: Was the perpetrator wearing a jacket?
+      config:
+        meta:
+          synonyms: [has_jacket, coat?]
+      data_tests: [not_null]
+    - name: behavior
+      data_type: varchar
+      description: Short description of perpetrator behavior
+      config:
+        meta:
+          synonyms: [behavior, observed_action, state_of_mind]
+      data_tests: [not_null]
+    - name: region
+      data_type: varchar
+      description: Interpol agency region (the source sheet name; derived, not mapped)
+      data_tests: [not_null]
+
+models:
+  - name: stg_carmen_africa
+    description: AFRICA field reports mapped to the common data dictionary.
+    columns: *data_dictionary
+
+  - name: stg_carmen_america
+    description: AMERICA field reports mapped to the common data dictionary.
+    columns: *data_dictionary
+
+  - name: stg_carmen_asia
+    description: ASIA field reports mapped to the common data dictionary (some source headers are in Chinese).
+    columns: *data_dictionary
+
+  - name: stg_carmen_atlantic
+    description: ATLANTIC field reports mapped to the common data dictionary.
+    columns: *data_dictionary
+
+  - name: stg_carmen_australia
+    description: AUSTRALIA field reports mapped to the common data dictionary.
+    columns: *data_dictionary
+
+  - name: stg_carmen_europe
+    description: EUROPE field reports mapped to the common data dictionary.
+    columns: *data_dictionary
+
+  - name: stg_carmen_indian
+    description: INDIAN field reports mapped to the common data dictionary.
+    columns: *data_dictionary
+
+  - name: stg_carmen_pacific
+    description: PACIFIC field reports mapped to the common data dictionary.
+    columns: *data_dictionary

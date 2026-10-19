@@ -1,0 +1,81 @@
+version: 2
+
+# Months are calendar months (1-12) of date_witness, pooled across all years.
+# Probabilities are unrounded fractions (0-1); format as % in the presentation layer.
+# Each probability sits next to the counts it is derived from, so it can be re-aggregated.
+
+models:
+  - name: monthly_region_likelihood
+    description: >
+      (a) For each month, how likely Carmen Sandiego is to be found in each agency region.
+      The region with region_rank = 1 is where she is most likely to be found.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [sighting_month, region_name]
+    columns:
+      - name: sighting_month
+        description: Calendar month number (1-12) of the sighting.
+        data_tests: [not_null]
+      - name: region_name
+        description: Agency region of the HQ the reports were filed to.
+      - name: sightings
+        description: Sightings in the region that month.
+      - name: month_sightings
+        description: All sightings that month.
+      - name: probability
+        description: Fraction of the month's sightings in that region (sightings / month_sightings).
+      - name: region_rank
+        description: Rank of the region within the month by sightings (1 = most likely; ties share a rank).
+
+  - name: monthly_armed_jacket_no_hat
+    description: "(b) For each month, the probability Carmen is armed AND wearing a jacket, but NOT a hat."
+    columns:
+      - name: sighting_month
+        data_tests: [unique, not_null]
+      - name: sightings
+        description: All sightings that month.
+      - name: armed_jacket_no_hat_sightings
+        description: Sightings where she was armed, wore a jacket and no hat.
+      - name: probability_armed_jacket_no_hat
+        description: Fraction of the month's sightings where she was armed, wore a jacket and no hat.
+      - name: armed_sightings
+        description: Sightings where she was armed.
+      - name: probability_armed
+        description: Fraction of the month's sightings where she was armed.
+      - name: jacket_sightings
+        description: Sightings where she wore a jacket.
+      - name: probability_jacket
+        description: Fraction of the month's sightings where she wore a jacket.
+      - name: hat_sightings
+        description: Sightings where she wore a hat.
+      - name: probability_hat
+        description: Fraction of the month's sightings where she wore a hat.
+
+  - name: top_behaviors
+    description: >
+      (c) Carmen Sandiego's behaviours ranked by how often they were observed.
+      behavior_rank <= 3 gives her three most occurring behaviours.
+    columns:
+      - name: behavior_name
+        data_tests: [unique, not_null]
+      - name: sightings
+        description: Sightings showing the behaviour.
+      - name: total_sightings
+        description: All sightings.
+      - name: probability
+        description: Fraction of all sightings showing the behaviour (sightings / total_sightings).
+      - name: behavior_rank
+        description: Rank by number of sightings (ties share a rank).
+
+  - name: monthly_top_behavior_probability
+    description: "(d) For each month, the probability Carmen exhibits one of her three most occurring behaviours."
+    columns:
+      - name: sighting_month
+        data_tests: [unique, not_null]
+      - name: sightings
+        description: All sightings that month.
+      - name: top_behavior_sightings
+        description: Sightings that month showing a top-3 behaviour.
+      - name: probability_top_behavior
+        description: Fraction of the month's sightings showing a top-3 behaviour.

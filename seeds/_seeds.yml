@@ -1,0 +1,55 @@
+version: 2
+
+# Raw layer: one seed per sheet of carmen_sightings_20220629061307.xlsx.
+# Headers are kept exactly as in the workbook (quote_columns) so the mapping to the
+# common data dictionary happens visibly in the staging views.
+# Seeds load into the RAW schema.
+
+seeds:
+  - name: "carmen_sightings_20220629061307_AFRICA"
+    description: "Raw Interpol field reports from the AFRICA regional HQ."
+    config:
+      schema: raw
+      quote_columns: true
+
+  - name: "carmen_sightings_20220629061307_AMERICA"
+    description: "Raw Interpol field reports from the AMERICA regional HQ."
+    config:
+      schema: raw
+      quote_columns: true
+
+  - name: "carmen_sightings_20220629061307_ASIA"
+    description: "Raw Interpol field reports from the ASIA regional HQ (some headers in Chinese)."
+    config:
+      schema: raw
+      quote_columns: true
+
+  - name: "carmen_sightings_20220629061307_ATLANTIC"
+    description: "Raw Interpol field reports from the ATLANTIC regional HQ."
+    config:
+      schema: raw
+      quote_columns: true
+
+  - name: "carmen_sightings_20220629061307_AUSTRALIA"
+    description: "Raw Interpol field reports from the AUSTRALIA regional HQ."
+    config:
+      schema: raw
+      quote_columns: true
+
+  - name: "carmen_sightings_20220629061307_EUROPE"
+    description: "Raw Interpol field reports from the EUROPE regional HQ."
+    config:
+      schema: raw
+      quote_columns: true
+
+  - name: "carmen_sightings_20220629061307_INDIAN"
+    description: "Raw Interpol field reports from the INDIAN regional HQ."
+    config:
+      schema: raw
+      quote_columns: true
+
+  - name: "carmen_sightings_20220629061307_PACIFIC"
+    description: "Raw Interpol field reports from the PACIFIC regional HQ."
+    config:
+      schema: raw
+      quote_columns: true

@@ -1,0 +1,173 @@
+version: 2
+
+# Normalised (3NF / BCNF) schema built from int_sightings_unioned.
+# Tests enforce every candidate key and foreign key, so the normal forms are
+# checked on every build rather than only claimed.
+
+models:
+  - name: city
+    description: >
+      HQ cities that field agents file reports to, with their region. Region is a property
+      of the HQ: each regional sheet groups the reports filed to that region's HQs.
+      Sighting cities live in location. A few HQ values are countries or areas as
+      reported (e.g. Argentina, Canary).
+    columns:
+      - name: city_id
+        description: Surrogate key (hash of city_name).
+        data_tests: [unique, not_null]
+      - name: city_name
+        description: HQ city the report is filed to.
+        data_tests: [unique, not_null]
+      - name: region
+        description: Interpol agency region the HQ belongs to.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments:
+                values: [AFRICA, AMERICA, ASIA, ATLANTIC, AUSTRALIA, EUROPE, INDIAN, PACIFIC]
+
+  - name: location
+    description: Places where Carmen was sighted, one per sighting city, with country and coordinates.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [latitude, longitude]
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [city_name, country_code]
+    columns:
+      - name: location_id
+        description: Surrogate key (hash of latitude and longitude).
+        data_tests: [unique, not_null]
+      - name: latitude
+        data_tests: [not_null]
+      - name: longitude
+        data_tests: [not_null]
+      - name: city_name
+        description: City of sighting.
+        data_tests: [not_null]
+      - name: country_code
+        description: ISO 3166 alpha-2 country code.
+        data_tests: [not_null]
+
+  - name: agent
+    description: Interpol field agents. Agents file to several HQs, so HQ is not an agent attribute.
+    columns:
+      - name: agent_id
+        description: Surrogate key (hash of agent_name).
+        data_tests: [unique, not_null]
+      - name: agent_name
+        data_tests: [unique, not_null]
+
+  - name: witness
+    description: Witnesses of sightings. Assumes a name identifies one person.
+    columns:
+      - name: witness_id
+        description: Surrogate key (hash of witness_name).
+        data_tests: [unique, not_null]
+      - name: witness_name
+        data_tests: [unique, not_null]
+
+  - name: behavior
+    description: Observed behaviours of Carmen Sandiego.
+    columns:
+      - name: behavior_id
+        description: Surrogate key (hash of behavior_name).
+        data_tests: [unique, not_null]
+      - name: behavior_name
+        data_tests: [unique, not_null]
+
+  - name: dim_date
+    description: >
+      One row per calendar day, from the earliest sighting to the latest filing date.
+      Role-playing dimension for sighting.date_witness and sighting.date_agent.
+    columns:
+      - name: date_day
+        description: Calendar day (primary key).
+        data_tests: [unique, not_null]
+      - name: year
+      - name: quarter
+      - name: month
+        description: Calendar month number (1-12).
+      - name: month_name
+        description: Abbreviated month name, e.g. Jan.
+      - name: year_month
+        description: First day of the month, for year-month grouping.
+      - name: day_of_month
+      - name: day_name
+
+  - name: sighting
+    description: One row per field report of a Carmen Sandiego sighting.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [date_witness, witness_id, agent_id, location_id]
+      - dbt_utils.equal_rowcount:
+          arguments:
+            compare_model: ref('int_sightings_unioned')
+    columns:
+      - name: sighting_id
+        description: Surrogate key (hash of date_witness, witness, agent and coordinates).
+        data_tests: [unique, not_null]
+      - name: date_witness
+        description: Date of witness sighting.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: date_agent
+        description: Date the field agent filed the report.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('dim_date')
+                field: date_day
+      - name: location_id
+        description: Where Carmen was seen.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('location')
+                field: location_id
+      - name: city_id
+        description: HQ city the report was filed to.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('city')
+                field: city_id
+      - name: agent_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('agent')
+                field: agent_id
+      - name: witness_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('witness')
+                field: witness_id
+      - name: behavior_id
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('behavior')
+                field: behavior_id
+      - name: has_weapon
+        description: Was Carmen observed to be armed?
+        data_tests: [not_null]
+      - name: has_hat
+        description: Was Carmen wearing a hat?
+        data_tests: [not_null]
+      - name: has_jacket
+        description: Was Carmen wearing a jacket?
+        data_tests: [not_null]

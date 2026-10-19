@@ -1,0 +1,22 @@
+version: 2
+
+models:
+  - name: int_sightings_unioned
+    description: >
+      Union of the eight staging views: one row per field report (13,582 rows), in the
+      common data dictionary. Tests here guard the assumptions the core schema relies on.
+    data_tests:
+      - dbt_utils.unique_combination_of_columns:
+          arguments:
+            combination_of_columns: [date_witness, witness, agent, city, country]
+      - dbt_utils.expression_is_true:
+          arguments:
+            expression: "date_agent >= date_witness"
+          config:
+            severity: warn
+    columns:
+      - name: region
+        data_tests:
+          - accepted_values:
+              arguments:
+                values: [AFRICA, AMERICA, ASIA, ATLANTIC, AUSTRALIA, EUROPE, INDIAN, PACIFIC]
